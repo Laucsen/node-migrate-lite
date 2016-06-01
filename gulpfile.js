@@ -18,7 +18,11 @@ require('babel-core/register');
 gulp.task('static', function () {
   return gulp.src('**/*.js')
     .pipe(excludeGitignore())
-    .pipe(eslint())
+    .pipe(eslint({
+      globals: {
+        expect: true
+      }
+    }))
     .pipe(eslint.format())
     .pipe(eslint.failAfterError());
 });
@@ -42,7 +46,10 @@ gulp.task('test', ['pre-test'], function (cb) {
 
   gulp.src('test/**/*.js')
     .pipe(plumber())
-    .pipe(mocha({reporter: 'spec'}))
+    .pipe(mocha({
+      reporter: 'spec',
+      require: ['./mocha.conf.js']
+    }))
     .on('error', function (err) {
       mochaErr = err;
     })
