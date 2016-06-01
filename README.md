@@ -1,18 +1,28 @@
 # node-migrate-lite [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][daviddm-image]][daviddm-url] [![Coverage percentage][coveralls-image]][coveralls-url]
-> Migration your node application&#39;s database with simplicity.
+> Migrating your node application&#39;s database with simplicity.
 
 ## Installation
 
+Install globally to generate migrations wiht command line. 
+
 ```sh
-$ npm install --save node-migrate-lite
+$ npm install node-migrate-lite -g
+```
+
+And on your `package.json` to migrate your database programmatically.
+
+```sh
+$ npm install node-migrate-lite --save
 ```
 
 ## Usage
 
 ```js
-var nodeMigrateLite = require('node-migrate-lite');
+Usage: migrate [command]
 
-nodeMigrateLite('Rainbow');
+Commands:
+
+  --create [name]       create a migrate with with given [name]
 ```
 ## License
 
