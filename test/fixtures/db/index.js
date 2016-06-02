@@ -1,6 +1,10 @@
 
 export var DB = {};
 
+export function clear() {
+  DB = {};
+}
+
 export function data(database) {
   if (DB[database] === undefined) {
     DB[database] = [];
