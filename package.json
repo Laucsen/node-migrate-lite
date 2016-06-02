@@ -12,6 +12,9 @@
     "dist"
   ],
   "main": "dist/index.js",
+  "bin": {
+    "migrate-lite": "./bin/node-migrate-lite.js"
+  },
   "keywords": [
     "migration",
     "migrate"

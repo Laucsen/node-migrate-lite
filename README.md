@@ -1,6 +1,8 @@
 # node-migrate-lite [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][daviddm-image]][daviddm-url] [![Coverage percentage][coveralls-image]][coveralls-url]
 > Migrating your node application&#39;s database with simplicity.
 
+This lib achieve to be simple. No fancy features, no complexity.
+
 ## Installation
 
 Install globally to generate migrations wiht command line. 
@@ -22,7 +24,7 @@ Usage: migrate [command]
 
 Commands:
 
-  --create [name]       create a migrate with with given [name]
+  --create [name]       create a new migration file with given [name]
 ```
 ## License
 
