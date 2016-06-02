@@ -1,9 +1,12 @@
+import fs from 'fs';
+import fsExtra from 'fs-extra';
+
 import migrate from '../../lib';
 
 import {configFiles, handlers} from '../fixtures/fixtures';
 
 describe('node-migration-lite', () => {
-  describe.only('command: create', () => {
+  describe('command: create', () => {
     it('should create a file on repository location with given name and time stamp', () => {
       var m = migrate.init({
         config: configFiles.SAMPLE_FILE,
@@ -11,7 +14,11 @@ describe('node-migration-lite', () => {
       });
       expect(m.initialized).not.to.be.equal(false);
 
-      m.create('Add-Pets');
+      var created = m.create('Add-Pets');
+
+      expect(fs.statSync(created).isFile()).to.be.equal(true);
+
+      fsExtra.unlink(created);
     });
   });
 });
