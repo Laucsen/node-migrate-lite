@@ -1,82 +1,68 @@
-import assert from 'assert';
+import fsExtra from 'fs-extra';
+
 import migrate from '../lib';
+
+var ROOT_FILE = './.nmlite';
+var SAMPLE_FILE = './test/fixtures/configfile/.configA';
+var EMPTY_FILE = './test/fixtures/configfile/.configB';
+var INEXISTENT_FILE = './test/fixtures/configfile/.inexistentConfigFileASDQWEZXC';
+var CORRUPT_FILE = './test/fixtures/configfile/.configErrorA';
+var NO_MIGRATION_FOLDER = './test/fixtures/configfile/.configErrorB';
 
 describe('node-migration-lite', () => {
   describe('module initialization', () => {
-    it('should be initialized with a custom file, on root folder of yout project', () => {
+    it('should be initialized with a custom file, on root folder of your project', () => {
+      fsExtra.copySync(SAMPLE_FILE, ROOT_FILE);
+
       var m = migrate.init();
-      assert(m.initialized !== false, 'we expected migration to be initialized with default data.');
+
+      expect(m.initialized).not.to.be.equal(false);
+      fsExtra.unlink(ROOT_FILE);
     });
 
     it('should be initialized with a given custom file location', () => {
       var m = migrate.init({
-        config: './test/fixtures/configfile/.configA'
+        config: SAMPLE_FILE
       });
-      assert(m.initialized !== false, 'we expected migration to be initialized with custom data.');
+      expect(m.initialized).not.to.be.equal(false);
     });
 
     it('should fail when default config file is not found', () => {
       var m = migrate.init();
       expect(m.initialized).to.be.equal(false);
-      expect(m.errorMessage).to.be.equal('Configuration file is not found: ./.nmLite');
+      expect(m.errorMessage).to.be.equal('Configuration file is not found: ' + ROOT_FILE);
     });
 
     it('should fail when configured file is not found', () => {
       var m = migrate.init({
-        config: './test/fixtures/configfile/.inexistentConfigFileASDQWEZXC'
+        config: INEXISTENT_FILE
       });
-      assert(m.initialized === false, 'we expected error on inexistent configuration file.');
-      assert(m.errorMessage === 'Impossible to read file: ./test/fixtures/configfile/.configErrorA', 'we expected a message about current error.');
+      expect(m.initialized).to.be.equal(false);
+      expect(m.errorMessage).to.be.equal('Configuration file is not found: ' + INEXISTENT_FILE);
     });
 
     it('should fail on configuration with invalid data', () => {
       var m = migrate.init({
-        config: './test/fixtures/configfile/.configErrorA'
+        config: CORRUPT_FILE
       });
-      assert(m.initialized === false, 'we expected error on invalid files.');
-      assert(m.errorMessage === 'Impossible to read file: ./test/fixtures/configfile/.configErrorA', 'we expected a message about current error.');
+      expect(m.initialized).to.be.equal(false);
+      expect(m.errorMessage).to.be.equal('Impossible to read file: ' + CORRUPT_FILE);
     });
 
     it('should fail on configuration without migration #repository', () => {
       var m = migrate.init({
-        config: './test/fixtures/configfile/.configErrorB'
+        config: EMPTY_FILE
       });
-      assert(m.initialized === false, 'we expected error config files without a repository information.');
-      assert(m.errorMessage === 'Configuration file has not a repository information.', 'we expected a message about current error.');
+      expect(m.initialized).to.be.equal(false);
+      expect(m.errorMessage).to.be.equal('Configuration file has not a repository information.');
     });
 
-    it('should fail on configuration without migration: #handler', () => {
-      var m = migrate.init({
-        config: './test/fixtures/configfile/.configErrorC'
-      });
-      assert(m.initialized === false, 'we expected error config files without a handler information.');
-      assert(m.errorMessage === 'Configuration file has not a handler information.', 'we expected a message about current error.');
-    });
-  });
-
-  describe('config file validation', () => {
     it('should check for mandatory existence migration folder, setted on config file', () => {
       var mc = migrate.init({
-        config: './test/fixtures/configfile/.configErrorD'
+        config: NO_MIGRATION_FOLDER
       });
-      assert(mc.initialized === false, 'we expected error config files with repository folder not found.');
-      assert(mc.errorMessage === 'Configured repository is not a folder: ???.', 'we expected a message about current error.');
-    });
-
-    it('should check for existence of mandatory #handler implementation', () => {
-      var mc = migrate.init({
-        config: './test/fixtures/configfile/.configErrorE'
-      });
-      assert(mc.initialized === false, 'we expected error config files with handler not found.');
-      assert(mc.errorMessage === 'Configured handler is not found: ???.', 'we expected a message about current error.');
-    });
-
-    it('should check for save and load function on #handler implementation', () => {
-      var mc = migrate.init({
-        config: './test/fixtures/configfile/.configErrorF'
-      });
-      assert(mc.initialized === false, 'we expected error config files unimplemented handler.');
-      assert(mc.errorMessage === 'Configured handler is not implemented: ???.', 'we expected a message about current error.');
+      expect(mc.errorMessage).to.be.equal('Configured repository is not a folder: test/fixtures/fakefolderasd');
+      expect(mc.initialized).to.be.equal(false);
     });
   });
 });
