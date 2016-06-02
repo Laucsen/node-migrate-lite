@@ -2,27 +2,25 @@ import fsExtra from 'fs-extra';
 
 import migrate from '../lib';
 
-var ROOT_FILE = './.nmlite';
-var SAMPLE_FILE = './test/fixtures/configfile/.configA';
-var EMPTY_FILE = './test/fixtures/configfile/.configB';
-var INEXISTENT_FILE = './test/fixtures/configfile/.inexistentConfigFileASDQWEZXC';
-var CORRUPT_FILE = './test/fixtures/configfile/.configErrorA';
-var NO_MIGRATION_FOLDER = './test/fixtures/configfile/.configErrorB';
+import {configFiles, handlers} from './fixtures/fixtures';
 
 describe('node-migration-lite', () => {
   describe('module initialization', () => {
     it('should be initialized with a custom file, on root folder of your project', () => {
-      fsExtra.copySync(SAMPLE_FILE, ROOT_FILE);
+      fsExtra.copySync(configFiles.SAMPLE_FILE, configFiles.ROOT_FILE);
 
-      var m = migrate.init();
+      var m = migrate.init({
+        handler: handlers.HANDLER_A
+      });
 
       expect(m.initialized).not.to.be.equal(false);
-      fsExtra.unlink(ROOT_FILE);
+      fsExtra.unlink(configFiles.ROOT_FILE);
     });
 
     it('should be initialized with a given custom file location', () => {
       var m = migrate.init({
-        config: SAMPLE_FILE
+        config: configFiles.SAMPLE_FILE,
+        handler: handlers.HANDLER_A
       });
       expect(m.initialized).not.to.be.equal(false);
     });
@@ -30,28 +28,28 @@ describe('node-migration-lite', () => {
     it('should fail when default config file is not found', () => {
       var m = migrate.init();
       expect(m.initialized).to.be.equal(false);
-      expect(m.errorMessage).to.be.equal('Configuration file is not found: ' + ROOT_FILE);
+      expect(m.errorMessage).to.be.equal('Configuration file is not found: ' + configFiles.ROOT_FILE);
     });
 
     it('should fail when configured file is not found', () => {
       var m = migrate.init({
-        config: INEXISTENT_FILE
+        config: configFiles.INEXISTENT_FILE
       });
       expect(m.initialized).to.be.equal(false);
-      expect(m.errorMessage).to.be.equal('Configuration file is not found: ' + INEXISTENT_FILE);
+      expect(m.errorMessage).to.be.equal('Configuration file is not found: ' + configFiles.INEXISTENT_FILE);
     });
 
     it('should fail on configuration with invalid data', () => {
       var m = migrate.init({
-        config: CORRUPT_FILE
+        config: configFiles.CORRUPT_FILE
       });
       expect(m.initialized).to.be.equal(false);
-      expect(m.errorMessage).to.be.equal('Impossible to read file: ' + CORRUPT_FILE);
+      expect(m.errorMessage).to.be.equal('Impossible to read file: ' + configFiles.CORRUPT_FILE);
     });
 
     it('should fail on configuration without migration #repository', () => {
       var m = migrate.init({
-        config: EMPTY_FILE
+        config: configFiles.EMPTY_FILE
       });
       expect(m.initialized).to.be.equal(false);
       expect(m.errorMessage).to.be.equal('Configuration file has not a repository information.');
@@ -59,9 +57,17 @@ describe('node-migration-lite', () => {
 
     it('should check for mandatory existence migration folder, setted on config file', () => {
       var mc = migrate.init({
-        config: NO_MIGRATION_FOLDER
+        config: configFiles.NO_MIGRATION_FOLDER
       });
       expect(mc.errorMessage).to.be.equal('Configured repository is not a folder: test/fixtures/fakefolderasd');
+      expect(mc.initialized).to.be.equal(false);
+    });
+
+    it('should repository not to be a file', () => {
+      var mc = migrate.init({
+        config: configFiles.REPOSITORY_AS_FILE
+      });
+      expect(mc.errorMessage).to.be.equal('Configured repository is not a folder: test/fixtures/configfile/.configA');
       expect(mc.initialized).to.be.equal(false);
     });
   });
