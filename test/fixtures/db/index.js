@@ -26,6 +26,18 @@ export function data(database) {
         }
       }
       next();
+    },
+    delete: function (id, items, next) {
+      var self = this;
+      for (var j = 0; j < items.length; j++) {
+        for (var i = 0; i < DB[self.db].length; i++) {
+          if (DB[self.db][i][id] === items[j]) {
+            DB[self.db].splice(i, 1);
+            i--;
+          }
+        }
+      }
+      next();
     }
   };
 }

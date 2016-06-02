@@ -10,5 +10,5 @@ exports.up = function (next) {
 };
 
 exports.down = function (next) {
-  next();
+  db.data('File').delete('name', ['james.txt'], next);
 };

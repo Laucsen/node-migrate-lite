@@ -13,5 +13,7 @@ exports.up = function (next) {
 };
 
 exports.down = function (next) {
-  next();
+  db.data('Document').delete('name', [
+    'james.doc',
+    'ritalia.doc'], next);
 };

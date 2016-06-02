@@ -10,5 +10,8 @@ exports.up = function (next) {
 };
 
 exports.down = function (next) {
-  next();
+  db.data('Document').change('name', {
+    name: 'james.doc',
+    owner: 'james'
+  }, next);
 };

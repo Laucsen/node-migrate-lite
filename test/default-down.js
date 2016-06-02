@@ -4,14 +4,11 @@ import {configFiles} from './fixtures/fixtures';
 
 import * as DB from './fixtures/db';
 
-describe('execute migrations', () => {
-  beforeEach(() => {
+var saved;
+
+describe('execute migrations - down', () => {
+  beforeEach(done => {
     DB.clear();
-  });
-
-  it('should migrate all migrations', done => {
-    var saved;
-
     var m = migrate.init({
       config: configFiles.SAMPLE_FILE,
       handler: {
@@ -24,27 +21,44 @@ describe('execute migrations', () => {
         }
       }
     });
+    m.up(() => {
+      done();
+    });
+  });
+
+  it('should down all migrations', done => {
+    var m = migrate.init({
+      config: configFiles.SAMPLE_FILE,
+      handler: {
+        save: (migration, state, action, next) => {
+          saved = state;
+          next();
+        },
+        load: next => {
+          next(saved);
+        }
+      }
+    });
 
     expect(m.initialized).not.to.be.equal(false);
 
-    m.up(err => {
+    m.down(err => {
       expect(err).to.be.equal(null);
 
       // EXPECT FAKE DB TO HAS MIGRATED DATA.
-      expect(DB.DB.Document.length).to.be.equal(2);
-      expect(DB.DB.File.length).to.be.equal(1);
-      expect(DB.DB.Document[0].owner).to.be.equal('albert einstein');
+      expect(DB.DB.Document.length).to.be.equal(0);
+      expect(DB.DB.File.length).to.be.equal(0);
 
       // EXPECT SAVE TO HAVE DB SCHEMA
       expect(saved).not.to.be.equal(undefined);
-      expect(saved.length).to.be.equal(3);
+      expect(saved.length).to.be.equal(0);
 
       done();
     });
   });
 
-  it('should call only not saved migrations', done => {
-    var saved;
+  it('should call down only saved migrations', done => {
+    saved.splice(0, 2);
 
     var m = migrate.init({
       config: configFiles.SAMPLE_FILE,
@@ -54,27 +68,25 @@ describe('execute migrations', () => {
           next();
         },
         load: next => {
-          next([{
-            timestamp: '1000000000010',
-            migration: 'Add-Files'
-          }]);
+          next(saved);
         }
       }
     });
 
     expect(m.initialized).not.to.be.equal(false);
 
-    m.up(err => {
+    m.down(err => {
       expect(err).to.be.equal(null);
+
+      expect(DB.DB.Document[0].owner).to.be.equal('james');
 
       // EXPECT FAKE DB TO HAS MIGRATED DATA.
       expect(DB.DB.Document.length).to.be.equal(2);
-      expect(DB.DB.File).to.be.equal(undefined);
-      expect(DB.DB.Document[0].owner).to.be.equal('albert einstein');
+      expect(DB.DB.File.length).to.be.equal(1);
 
       // EXPECT SAVE TO HAVE DB SCHEMA
       expect(saved).not.to.be.equal(undefined);
-      expect(saved.length).to.be.equal(3);
+      expect(saved.length).to.be.equal(0);
 
       done();
     });
