@@ -12,7 +12,7 @@ describe('execute migrations - up', () => {
   it('should migrate all migrations', done => {
     var saved;
 
-    var m = migrate.v({
+    var m = migrate.init({
       config: configFiles.SAMPLE_FILE,
       handler: {
         save: (migration, state, action, next) => {
