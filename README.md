@@ -17,6 +17,20 @@ And on your `package.json` to migrate your database programmatically.
 $ npm install node-migrate-lite --save
 ```
 
+## Configuration
+
+Node Migrate Lite uses a config file on your root folder with data about where you want to store your migrations. 
+
+Create a `.nmlite` file on your root folder with:
+
+```
+{
+  "repository": "path/to/yout/migration/directory"
+}
+```
+
+Note that all your migration will be created there and will be loaded from there.
+
 ## Usage
 
 ```js
@@ -26,6 +40,36 @@ Commands:
 
   --create [name]       create a new migration file with given [name]
 ```
+
+Note: All command that load and create migrations will use configured `repository` folder.
+
+Created files are created with a time stamp, used to determine which time it was created.
+
+## Programmatic usage
+
+```
+import nodeMigrate from 'node-migrate-lite';
+
+var m = migrate.v({
+  // You must configure a handler object. Save and Load function are used by node-migrate-lite to tell you data that must be saved and loaded. This will give to you autonomy to save this where you want, file or datavase.
+  handler: {
+    save: (migration, state, action, next) => {
+      // migration - Data about current migration file.
+      // state - Data about current database state.
+      // aciond - added to up operation and removed to down.
+      next();
+    },
+    load: next => {
+      var yourData = [...];
+      // yourData - An array of saved migrations, like state on save handler.
+      // The first time, you can pass an empty array. Later, you can get this array from save operation and save somewhere.
+      // Next time, you will get this saved array and pass on next() as paramether to node-migration-library.
+      next(yourData);
+    }
+  }
+});
+```
+
 ## License
 
 MIT © [Diego Laucsen](www.laucsen.com)
