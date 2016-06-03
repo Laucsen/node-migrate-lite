@@ -33,19 +33,23 @@ Note that all your migration will be created there and will be loaded from there
 
 ## Usage
 
+First of all, you have to start to create migrations. By installing this library globally, you can do it with following commands:
+
 ```js
-Usage: migrate [command]
+Usage: migrate-lite [command]
 
 Commands:
 
   --create [name]       create a new migration file with given [name]
 ```
 
-Note: All command that load and create migrations will use configured `repository` folder.
+> All command that load and create migrations will use configured `repository` folder.
 
-Created files are created with a time stamp, used to determine which time it was created.
+> Created files are created with a time stamp, used to determine which time it was created.
 
 ## Programmatic usage
+
+Now it is time to include this library to your code and start to migrating dta into your database. Do it following this snippet:
 
 ```
 import nodeMigrate from 'node-migrate-lite';
@@ -69,6 +73,107 @@ var m = migrate.v({
   }
 });
 ```
+
+
+### Handlers
+
+To achieve simplicity and to be agnostic to database types and libraries, this library initialization demand an implementation for two handlers: one to load Schema State about your database and other to save.
+
+The main idea of this approach, is to left to library user the control of database schema state, so you can save it anywhere: File, NoSql Database, Sql Database, Redis...
+
+#### Save
+
+This handler is called by node-migrate-te engine every time he execute a migration with success. Your handler function can use three set of data, lie this:
+
+```
+save: (migration, state, action, next) => {
+  next();
+},
+```
+
+This this case, you can use `migration`, `state` and `action` to choose how to store current migration data and `next` to tell node-migrate-lite engine to continue its work.
+
+* **migration** - Current executed migration.
+* **state** - Current state. It is an Array with all migrations that have been executed (up) on your database. Ot means that removed (down) migrations will not be on this array.
+* **action** - Tells if current `migration` was `added` or `removed`.
+* **next** - Callback to return to node-migrate-lite process.
+
+#### Load
+
+This handler is called by node-migrate-engine on the beginning of the process asking by the current schema state. Your handler function must return an array of data, the same as passed on save handler on a latter time.
+    
+## Migration File
+
+Every time you call `migrate-lite --create something` to create a migration, a default file will be create on your repository folder like this:
+
+```
+'use strict';
+
+exports.up = function (next) {
+  next();
+};
+
+exports.down = function (next) {
+  next();
+};
+
+```
+
+On this file, to each data you want to migrate, you must insert the commands (based on your database type) to add data on `up` and commands to remove this same data on `down`. 
+
+> The net function is important if you want to use asynchronous events on migration. You do your job, then call next.
+
+For example, if you want to create a migration to add persons to your database:
+
+``` sh
+$ migrate-lite create add-person
+```
+
+Then, go to created 1414323423423-add-person.js and do:
+
+```
+var db = require('./db');
+
+exports.up = function(next){
+  db.add('person', 'tobi');
+  db.add('person', 'loki');
+  db.add('person', 'jane');
+  next();
+};
+
+exports.down = function(next){
+  db.remove('person', 'tobi');
+  db.remove('person', 'loki');
+  db.remove('person', 'jane');
+  next();
+};
+```
+
+### Errors
+
+You can return an error thought next function to tell node-migrate-lite engine that an error has ocourred and the migration proccess must stop.
+
+```
+exports.up = function (next) {
+  next(new Error('Some important Error!'));
+};
+```
+
+## API
+
+### migrate.init(options)
+
+Configure and return a `Migrate` object.
+
+`options.handler` - Required object with implementation of `save` and `load` handlers.
+
+### Migrate.up(callback)
+
+Migrate up all not migrated `migrations`. Function `callback` is called at the end of process with a possible error.
+
+### Migrate.down(callback)
+
+Migrate down all already migrated `migrations`. Function `callback` is called at the end of process with a possible error.
 
 ## License
 
