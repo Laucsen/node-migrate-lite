@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 
 var migrate = require('../dist').default;
 
@@ -69,7 +70,7 @@ if (commandCtrl[options.command].args !== options.args.length) {
 }
 
 var mig = migrate.init({
-  config: 'test/fixtures/configfile/.configA',
+  config: '.nmlite',
   handler: {
     load: function () {},
     save: function () {}

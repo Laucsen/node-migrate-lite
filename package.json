@@ -9,15 +9,16 @@
     "url": "www.laucsen.com"
   },
   "files": [
+    "bin",
     "dist"
   ],
   "main": "dist/index.js",
   "bin": {
-    "migrate-lite": "./bin/node-migrate-lite.js"
+    "migrate-lite": "./bin/nodemigratelite"
   },
   "keywords": [
-    "migration",
-    "migrate"
+    "migrate",
+    "migrations"
   ],
   "devDependencies": {
     "babel-core": "^6.9.1",
