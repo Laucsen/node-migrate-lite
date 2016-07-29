@@ -3,7 +3,7 @@ import migrate from '../lib';
 import {configFiles} from './fixtures/fixtures';
 
 describe('error controll', () => {
-  it('should return error when user callback with errors', done => {
+  it('should return error when user callback with errors (a)', done => {
     var m = migrate.init({
       config: configFiles.SAMPLE_FILE_B,
       handler: {
@@ -23,7 +23,7 @@ describe('error controll', () => {
       done();
     });
   });
-  it('should return error when user callback with errors', done => {
+  it('should return error when user callback with errors  (b)', done => {
     var m = migrate.init({
       config: configFiles.SAMPLE_FILE_C,
       handler: {
