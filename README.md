@@ -151,13 +151,21 @@ exports.down = function(next){
 
 ### Errors
 
-You can return an error thought next function to tell node-migrate-lite engine that an error has ocourred and the migration proccess must stop.
+You can return an error thought next function to tell node-migrate-lite engine that an error has occurred and the migration proccess must stop.
 
 ```
 exports.up = function (next) {
   next(new Error('Some important Error!'));
 };
 ```
+
+### Error control and Rollback
+
+Every time you send an error or and error is thrown on `up` process, node-migrate-lite library will try to rollback every migration on last operation, by calling `down` of each one.
+
+For example, if you have 10 migration and will ad more 8, and something happen on forth, all this 4 migration swill be rollback'ed, left only initial 10 migrations active.
+
+This is useful to keep your database on same state if something going wrong.
 
 ## API
 
@@ -174,6 +182,15 @@ Migrate up all not migrated `migrations`. Function `callback` is called at the e
 ### Migrate.down(callback)
 
 Migrate down all already migrated `migrations`. Function `callback` is called at the end of process with a possible error.
+
+## Changelog
+
+#### 0.1.0
+- Default tasks: `up` and `down`.
+- Command line to create new migrations on your configured repository.
+
+#### 0.2.0
+- Roll back capability. Call `down` of migrations on error.
 
 ## License
 
