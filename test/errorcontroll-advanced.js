@@ -8,9 +8,7 @@ var migrations;
 var saved;
 
 describe('error control advanced', () => {
-
   describe('with informed errors', () => {
-
     describe('whitout data', () => {
       it('should return error when user callback with errors and downgrade all applied migrations', done => {
         saved = undefined;

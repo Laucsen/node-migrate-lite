@@ -2,7 +2,7 @@
 
 var db = require('../../db');
 
-exports.up = function (next) {
+exports.up = function () {
   throw new Error('Impossible to do that! Error forced on second step.');
 };
 
