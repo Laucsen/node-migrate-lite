@@ -24,7 +24,7 @@ var usage = [
   '',
   '  Commands:',
   '',
-  '     create [title]   create a new migration file with given [title]',
+  '     --create [title]   create a new migration file with given [title]',
   ''
 ].join('\n');
 

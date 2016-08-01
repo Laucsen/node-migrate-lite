@@ -2,7 +2,7 @@ import migrate from '../lib';
 
 import {configFiles, handlers} from './fixtures/fixtures';
 
-describe('state handler file', () => {
+describe('state handler file configuration', () => {
   describe('handler: programatically', () => {
     it('should check for handler object and load/save function', () => {
       var m = migrate.init({
