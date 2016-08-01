@@ -42,10 +42,6 @@ describe('error control advanced', () => {
 
     describe('with data', () => {
       before(done => {
-        saved = [{
-          timestamp: '1000000000000',
-          migration: 'Add-Document'
-        }];
         DB.clear();
         DB.data('Document').create([{
           name: 'james.doc',
@@ -56,6 +52,11 @@ describe('error control advanced', () => {
         }], done);
       });
       it('should return error when user callback with errors and downgrade all applied migrations', done => {
+        saved = [{
+          timestamp: '1000000000000',
+          migration: 'Add-Document'
+        }];
+
         migrations = migrate.init({
           config: configFiles.SAMPLE_FILE_D,
           handler: {
@@ -77,6 +78,45 @@ describe('error control advanced', () => {
           expect(err).not.to.be.equal(null);
           expect(saved).to.have.lengthOf(1);
           expect(DB.DB.Document).to.have.lengthOf(2);
+          expect(counter).to.be.equal(1);
+          done();
+        });
+      });
+
+      it('should just ignore error on down when error is informed on down operation', done => {
+        saved = [{
+          timestamp: '1000000000000',
+          migration: 'Add-Document'
+        }, {
+          timestamp: '1000000000005',
+          migration: 'Add-Other-Document'
+        }, {
+          timestamp: '1000000000010',
+          migration: 'Add-Files'
+        }, {
+          timestamp: '1000000000100',
+          migration: 'Change-Document'
+        }];
+
+        migrations = migrate.init({
+          config: configFiles.SAMPLE_FILE_G,
+          handler: {
+            save: (migration, state, action, next) => {
+              saved = state;
+              next();
+            },
+            load: next => {
+              next(saved);
+            }
+          }
+        });
+        expect(migrations.initialized).not.to.be.equal(false);
+
+        var counter = 0;
+        migrations.down(err => {
+          counter++;
+
+          expect(err).not.to.be.equal(null);
           expect(counter).to.be.equal(1);
           done();
         });
@@ -153,6 +193,47 @@ describe('error control advanced', () => {
           expect(err).not.to.be.equal(null);
           expect(saved).to.have.lengthOf(1);
           expect(DB.DB.Document).to.have.lengthOf(2);
+          expect(counter).to.be.equal(1);
+          done();
+        });
+      });
+    });
+
+    describe('without data on down', () => {
+      it('should just ignore error on down when error iw thrown on down operation', done => {
+        saved = [{
+          timestamp: '1000000000000',
+          migration: 'Add-Document'
+        }, {
+          timestamp: '1000000000005',
+          migration: 'Add-Other-Document'
+        }, {
+          timestamp: '1000000000010',
+          migration: 'Add-Files'
+        }, {
+          timestamp: '1000000000100',
+          migration: 'Change-Document'
+        }];
+        DB.clear();
+        migrations = migrate.init({
+          config: configFiles.SAMPLE_FILE_F,
+          handler: {
+            save: (migration, state, action, next) => {
+              saved = state;
+              next();
+            },
+            load: next => {
+              next(saved);
+            }
+          }
+        });
+        expect(migrations.initialized).not.to.be.equal(false);
+
+        var counter = 0;
+        migrations.down(err => {
+          counter++;
+
+          expect(err).not.to.be.equal(null);
           expect(counter).to.be.equal(1);
           done();
         });

@@ -12,6 +12,8 @@ export var configFiles = {
   SAMPLE_FILE_C: './test/fixtures/configfile/.configD',
   SAMPLE_FILE_D: './test/fixtures/configfile/.configE',
   SAMPLE_FILE_E: './test/fixtures/configfile/.configF',
+  SAMPLE_FILE_F: './test/fixtures/configfile/.configG',
+  SAMPLE_FILE_G: './test/fixtures/configfile/.configH',
   INEXISTENT_FILE: './test/fixtures/configfile/.inexistentConfigFileASDQWEZXC',
   CORRUPT_FILE: './test/fixtures/configfile/.configErrorA',
   NO_MIGRATION_FOLDER: './test/fixtures/configfile/.configErrorB',
